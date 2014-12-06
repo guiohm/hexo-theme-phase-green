@@ -38,6 +38,11 @@
       loading = false;
     });
 
+    if (photoset.length === 1) {
+      $this.children('.control').remove();
+      return;
+    }
+
     $this.on('click', '.prev', function(){
       if (!loading){
         var next = (current - 1) % all;
