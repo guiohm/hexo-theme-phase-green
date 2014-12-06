@@ -16,5 +16,6 @@ twitter:
 github:
 
 fancybox: true
+excerpt_link: true
 google_analytics:
 rss:
