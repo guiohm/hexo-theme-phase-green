@@ -13,7 +13,7 @@ This is a fork from the [original phase theme](https://github.com/hexojs/hexo-th
 Execute the following command and modify `theme` in `_config.yml` to `phase-green`.
 
 ```
-git clone git://github.com/guiohm/hexo-theme-phase.git themes/phase-green
+git clone git://github.com/guiohm/hexo-theme-phase-green.git themes/phase-green
 ```
 
 ## Update
