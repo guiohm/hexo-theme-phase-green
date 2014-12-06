@@ -3,6 +3,7 @@
 Feel the flow of time with Phase, the most beautiful theme for [Hexo].
 This is a fork from the [original phase theme](https://github.com/hexojs/hexo-theme-phase). You may find a demo [here](http://guilhaume.fr/blog/). The main changes are:
 - Color is now green
+- I added french language support
 - I added polygons support into phasebeam.
 - I added a shutdown timer with friction into phasebeam so that it does not keep moving and using CPU/GPU ressources.
 - Removed controls in the gallery widget when only one image.
