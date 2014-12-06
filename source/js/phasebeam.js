@@ -6,7 +6,7 @@
 		config = {
 			polygon: {
 				sides: 5,
-				amount: 18,
+				amount: 23,
 				layer: 3,
 				color: [97, 207, 157],
 				alpha: 0.3
@@ -18,13 +18,15 @@
 				alpha: 0.3
 			},
 			line: {
-				amount: 7,
+				amount: 18,
 				layer: 3,
 				color: [255, 255, 255],
 				alpha: 0.3
 			},
-			speed: 0.5,
-			angle: 36
+			speed: 0.9,
+			angle: 36,
+			shutdowntimer: 2000, // milliseconds
+			friction: 0.995
 		};
 
 	if (background.getContext){
@@ -36,7 +38,7 @@
 			circles = [],
 			lines = [],
 			polygons = [],
-			wWidth, wHeight, timer;
+			wWidth, wHeight, timer, shutdowntimer;
 
 		requestAnimationFrame = window.requestAnimationFrame ||
 			window.mozRequestAnimationFrame ||
@@ -51,6 +53,11 @@
 			window.msCancelAnimationFrame ||
 			window.oCancelAnimationFrame ||
 			clearTimeout;
+
+		var resetAll = function() {
+			cancelAnimationFrame(timer);
+			shutdowntimer = config.shutdowntimer;
+		}
 
 		var setCanvasHeight = function(){
 			wWidth = $(window).width();
@@ -148,7 +155,11 @@
 
 		var animate = function(){
 			var sin = M.sin(degree),
-				cos = M.cos(degree);
+				cos = M.cos(degree),
+				friction,
+				stopAnimation = false;
+
+			friction = shutdowntimer > 0 ? 1 : config.friction;
 
 			if (config.polygon.amount > 0 && config.polygon.layer > 0){
 				fctx1.clearRect(0, 0, wWidth, wHeight);
@@ -156,8 +167,9 @@
 					var item = polygons[i],
 						x = item.x,
 						y = item.y,
-						radius = item.radius,
-						speed = item.speed;
+						radius = item.radius;
+
+					var speed = item.speed = item.speed*friction;
 
 					if (x > wWidth + radius){
 						x = -radius;
@@ -187,8 +199,9 @@
 					var item = circles[i],
 						x = item.x,
 						y = item.y,
-						radius = item.radius,
-						speed = item.speed;
+						radius = item.radius;
+
+					var speed = item.speed = item.speed*friction;
 
 					if (x > wWidth + radius){
 						x = -radius;
@@ -218,8 +231,12 @@
 					var item = lines[j],
 						x = item.x,
 						y = item.y,
-						width = item.width,
-						speed = item.speed;
+						width = item.width;
+
+					var speed = item.speed = item.speed*(friction+0.003);
+					if (speed < 0.1) {
+						stopAnimation = true;
+					}
 
 					if (x > wWidth + width * sin){
 						x = -width * sin;
@@ -243,7 +260,12 @@
 				}
 			}
 
-			timer = requestAnimationFrame(animate);
+			if (!stopAnimation) {
+				timer = requestAnimationFrame(animate);
+			} else {
+				console.log("Animation Stopped!");
+			}
+			shutdowntimer -= 1000/60;
 		};
 
 		var createItem = function(){
@@ -298,7 +320,7 @@
 				}
 			}
 
-			cancelAnimationFrame(timer);
+			resetAll();
 			timer = requestAnimationFrame(animate);
 			drawBack();
 		};
