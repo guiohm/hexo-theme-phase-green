@@ -4,20 +4,27 @@
 		foreground1 = canvas[1],
 		foreground2 = canvas[2],
 		config = {
-			circle: {
+			polygon: {
+				sides: 5,
 				amount: 18,
+				layer: 3,
+				color: [97, 207, 157],
+				alpha: 0.3
+			},
+			circle: {
+				amount: 0,
 				layer: 3,
 				color: [157, 97, 207],
 				alpha: 0.3
 			},
 			line: {
-				amount: 12,
+				amount: 7,
 				layer: 3,
 				color: [255, 255, 255],
 				alpha: 0.3
 			},
 			speed: 0.5,
-			angle: 20
+			angle: 36
 		};
 
 	if (background.getContext){
@@ -28,9 +35,10 @@
 			degree = config.angle/360*M.PI*2,
 			circles = [],
 			lines = [],
+			polygons = [],
 			wWidth, wHeight, timer;
-		
-		requestAnimationFrame = window.requestAnimationFrame || 
+
+		requestAnimationFrame = window.requestAnimationFrame ||
 			window.mozRequestAnimationFrame ||
 			window.webkitRequestAnimationFrame ||
 			window.msRequestAnimationFrame ||
@@ -53,6 +61,29 @@
 				this.height = wHeight;
 			});
 		};
+
+		var drawPolygon = function(x, y, radius, sides, color, alpha, startAngle, anticlockwise) {
+			if (sides < 3) return;
+			var a = (M.PI * 2)/sides;
+			a = anticlockwise?-a:a;
+			var gradient = fctx1.createRadialGradient(x, y, radius, x, y, 0);
+			gradient.addColorStop(0, 'rgba('+color[0]+','+color[1]+','+color[2]+','+alpha+')');
+			gradient.addColorStop(1, 'rgba('+color[0]+','+color[1]+','+color[2]+','+(alpha-0.1)+')');
+			fctx1.save();
+			fctx1.beginPath();
+			fctx1.translate(x,y);
+			if (startAngle) {
+				fctx1.rotate(startAngle);
+			}
+			fctx1.moveTo(radius,0);
+			for (var i = 1; i < sides; i++) {
+				fctx1.lineTo(radius*Math.cos(a*i),radius*Math.sin(a*i));
+			}
+			fctx1.closePath();
+			fctx1.restore();
+			fctx1.fillStyle = gradient;
+			fctx1.fill();
+		}
 
 		var drawCircle = function(x, y, radius, color, alpha){
 			var gradient = fctx1.createRadialGradient(x, y, radius, x, y, 0);
@@ -85,9 +116,9 @@
 			bctx.clearRect(0, 0, wWidth, wHeight);
 
 			var gradient = [];
-			
+
 			gradient[0] = bctx.createRadialGradient(wWidth*0.3, wHeight*0.1, 0, wWidth*0.3, wHeight*0.1, wWidth*0.9);
-			gradient[0].addColorStop(0, 'rgb(0, 26, 77)');
+			gradient[0].addColorStop(0, 'rgb(0, 77, 26)');
 			gradient[0].addColorStop(1, 'transparent');
 
 			bctx.translate(wWidth, 0);
@@ -97,7 +128,7 @@
 			bctx.fillRect(0, 0, wWidth, wHeight);
 
 			gradient[1] = bctx.createRadialGradient(wWidth*0.1, wHeight*0.1, 0, wWidth*0.3, wHeight*0.1, wWidth);
-			gradient[1].addColorStop(0, 'rgb(0, 150, 240)');
+			gradient[1].addColorStop(0, 'rgb(0, 240, 150)');
 			gradient[1].addColorStop(0.8, 'transparent');
 
 			bctx.translate(wWidth, 0);
@@ -107,7 +138,7 @@
 			bctx.fillRect(0, 0, wWidth, wHeight);
 
 			gradient[2] = bctx.createRadialGradient(wWidth*0.1, wHeight*0.5, 0, wWidth*0.1, wHeight*0.5, wWidth*0.5);
-			gradient[2].addColorStop(0, 'rgb(40, 20, 105)');
+			gradient[2].addColorStop(0, 'rgb(20, 105, 40)');
 			gradient[2].addColorStop(1, 'transparent');
 
 			bctx.beginPath();
@@ -118,6 +149,37 @@
 		var animate = function(){
 			var sin = M.sin(degree),
 				cos = M.cos(degree);
+
+			if (config.polygon.amount > 0 && config.polygon.layer > 0){
+				fctx1.clearRect(0, 0, wWidth, wHeight);
+				for (var i=0, len = polygons.length; i<len; i++){
+					var item = polygons[i],
+						x = item.x,
+						y = item.y,
+						radius = item.radius,
+						speed = item.speed;
+
+					if (x > wWidth + radius){
+						x = -radius;
+					} else if (x < -radius){
+						x = wWidth + radius
+					} else {
+						x += sin*speed;
+					}
+
+					if (y > wHeight + radius){
+						y = -radius;
+					} else if (y < -radius){
+						y = wHeight + radius;
+					} else {
+						y -= cos*speed;
+					}
+
+					item.x = x;
+					item.y = y;
+					drawPolygon(x, y, radius, item.sides, item.color, item.alpha, item.angle);
+				}
+			}
 
 			if (config.circle.amount > 0 && config.circle.layer > 0){
 				fctx1.clearRect(0, 0, wWidth, wHeight);
@@ -174,7 +236,7 @@
 					} else {
 						y -= cos*speed;
 					}
-					
+
 					item.x = x;
 					item.y = y;
 					drawLine(x, y, width, item.color, item.alpha);
@@ -185,8 +247,26 @@
 		};
 
 		var createItem = function(){
+			polygons = [];
 			circles = [];
 			lines = [];
+
+			if (config.polygon.amount > 0 && config.polygon.layer > 0){
+				for (var i=0; i<config.polygon.amount/config.polygon.layer; i++){
+					for (var j=0; j<config.polygon.layer; j++){
+						polygons.push({
+							sides: config.polygon.sides,
+							x: M.random() * wWidth,
+							y: M.random() * wHeight,
+							radius: M.random()*(20+j*5)+(20+j*5),
+							color: config.polygon.color,
+							alpha: M.random()*0.2+(config.polygon.alpha-j*0.1),
+							angle: M.random()*360/config.polygon.sides,
+							speed: config.speed*(1+j*0.5)
+						});
+					}
+				}
+			}
 
 			if (config.circle.amount > 0 && config.circle.layer > 0){
 				for (var i=0; i<config.circle.amount/config.circle.layer; i++){
