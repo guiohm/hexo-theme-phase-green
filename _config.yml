@@ -12,6 +12,10 @@ addthis:
   google: true
   pinterest: true
 
+sharing:
+  google_plus: true
+  facebook: true
+
 facebook:
 google_plus:
 twitter:
