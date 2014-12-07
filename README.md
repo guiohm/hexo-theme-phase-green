@@ -12,6 +12,7 @@ This is a fork from the [original phase theme](https://github.com/hexojs/hexo-th
 - Fixed gallery photos url
 - Added sharing on article but not home page
 - Fixed comments
+- Add direct facebook and google plus sharing buttons on article
 
 ## Install
 
