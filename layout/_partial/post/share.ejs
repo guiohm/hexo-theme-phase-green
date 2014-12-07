@@ -1,4 +1,4 @@
-<% if (theme.addthis.enable){ %>
+<% if (theme.addthis.enable && !is_home()){ %>
   <div class="sharing addthis_toolbox addthis_default_style">
     <% if (theme.addthis.facebook){ %>
       <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
