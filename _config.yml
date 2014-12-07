@@ -2,6 +2,8 @@ menu:
   Home: /
   Archives: /archives
 
+site_image: /images/Flower.jpg
+
 addthis:
   enable: true
   pubid:
