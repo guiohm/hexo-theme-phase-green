@@ -22,7 +22,7 @@
       <%- partial('post/category') %>
       <%- partial('post/tag') %>
       <%- partial('post/share') %>
-      <% if (config.disqus_shortname && item.comment){ %>
+      <% if (config.disqus_shortname && item.comments){ %>
         <a href="<%- item.permalink %>#disqus_thread" class="comment"><%= __('comment') %></a>
       <% } %>
     </footer>
