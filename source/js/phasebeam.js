@@ -65,7 +65,11 @@
 
 			canvas.each(function(){
 				this.width = wWidth;
-				this.height = wHeight;
+				if ($(this).hasClass('background')) {
+					this.height = wHeight;
+				} else {
+					this.height = 233;
+				}
 			});
 		};
 
