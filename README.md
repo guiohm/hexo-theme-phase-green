@@ -13,6 +13,7 @@ This is a fork from the [original phase theme](https://github.com/hexojs/hexo-th
 - Added sharing on article but not home page
 - Fixed comments
 - Add direct facebook and google plus sharing buttons on article
+- Added blog main title
 
 ## Install
 
