@@ -17,7 +17,7 @@
   <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js<% if (theme.addthis.pubid){ %>#pubid=<%= theme.addthis.pubid %><% } %>"></script>
 <% } %>
 
-<% if (!is_home() && theme.sharing.facebook || theme.sharing.google_plus){ %>
+<% if (!is_home() && (theme.sharing.facebook || theme.sharing.google_plus)){ %>
   <div class="sharing">
 
     <% if (theme.sharing.google_plus){ %>

@@ -1,5 +1,5 @@
 <article class="<% if (item.layout == 'page'){ %>page<% } else { %>post<% } %>">
-  <% if (item.photos){ %>
+  <% if (item.photos.length){ %>
     <%- partial('post/gallery') %>
   <% } %>
   <header>
