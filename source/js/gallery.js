@@ -1,16 +1,17 @@
 (function($){
   // Caption
-  $('.entry-content').each(function(i){
-    $(this).find('img').each(function(){
-      var alt = this.alt;
+  // TODO: find a way to use custom classes for images while using this...
+  // $('.entry-content').each(function(i){
+  //   $(this).find('img').each(function(){
+  //     var alt = this.alt;
 
-      if (alt){
-        $(this).after('<span class="caption">' + alt + '</span>');
-      }
+  //     if (alt){
+  //       $(this).after('<span class="caption">' + alt + '</span>');
+  //     }
 
-      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox" rel="gallery' + i + '" />');
-    });
-  });
+  //     $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox" rel="gallery' + i + '" />');
+  //   });
+  // });
 
   // Gallery
   var play = function(parent, item, callback){
