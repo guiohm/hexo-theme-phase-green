@@ -21,6 +21,7 @@ Execute the following command and modify `theme` in `_config.yml` to `phase-gree
 
 ```
 git clone git://github.com/guiohm/hexo-theme-phase-green.git themes/phase-green
+cp themes/phase-green/_config.yml.tpl themes/phase-green/_config.yml
 ```
 
 ## Update
@@ -31,6 +32,8 @@ Execute the following command to update the theme.
 cd themes/phase-green
 git pull
 ```
+
+Then check any new option in `_config.yml.tpl` and report any change in your unversionned file.
 
 ## Features
 
