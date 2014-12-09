@@ -23,9 +23,10 @@
 				color: [255, 255, 255],
 				alpha: 0.3
 			},
-			speed: 0.9,
+			speed: 0.6,
 			angle: 36,
-			shutdowntimer: 2000, // milliseconds
+			drawAreaHeight: 233,
+			shutdowntimer: 8000, // milliseconds
 			friction: 0.995
 		};
 
@@ -61,14 +62,14 @@
 
 		var setCanvasHeight = function(){
 			wWidth = $(window).width();
-			wHeight = $(window).height(),
+			wHeight = $(window).height();
 
 			canvas.each(function(){
 				this.width = wWidth;
 				if ($(this).hasClass('background')) {
 					this.height = wHeight;
 				} else {
-					this.height = 233;
+					this.height = config.drawAreaHeight;
 				}
 			});
 		};
@@ -161,12 +162,13 @@
 			var sin = M.sin(degree),
 				cos = M.cos(degree),
 				friction,
-				stopAnimation = false;
+				stopAnimation = false,
+				height = config.drawAreaHeight;
 
 			friction = shutdowntimer > 0 ? 1 : config.friction;
 
 			if (config.polygon.amount > 0 && config.polygon.layer > 0){
-				fctx1.clearRect(0, 0, wWidth, wHeight);
+				fctx1.clearRect(0, 0, wWidth, height);
 				for (var i=0, len = polygons.length; i<len; i++){
 					var item = polygons[i],
 						x = item.x,
@@ -183,10 +185,10 @@
 						x += sin*speed;
 					}
 
-					if (y > wHeight + radius){
+					if (y > height + radius){
 						y = -radius;
 					} else if (y < -radius){
-						y = wHeight + radius;
+						y = height + radius;
 					} else {
 						y -= cos*speed;
 					}
@@ -198,7 +200,7 @@
 			}
 
 			if (config.circle.amount > 0 && config.circle.layer > 0){
-				fctx1.clearRect(0, 0, wWidth, wHeight);
+				fctx1.clearRect(0, 0, wWidth, height);
 				for (var i=0, len = circles.length; i<len; i++){
 					var item = circles[i],
 						x = item.x,
@@ -215,10 +217,10 @@
 						x += sin*speed;
 					}
 
-					if (y > wHeight + radius){
+					if (y > height + radius){
 						y = -radius;
 					} else if (y < -radius){
-						y = wHeight + radius;
+						y = height + radius;
 					} else {
 						y -= cos*speed;
 					}
@@ -230,14 +232,14 @@
 			}
 
 			if (config.line.amount > 0 && config.line.layer > 0){
-				fctx2.clearRect(0, 0, wWidth, wHeight);
+				fctx2.clearRect(0, 0, wWidth, height);
 				for (var j=0, len = lines.length; j<len; j++){
 					var item = lines[j],
 						x = item.x,
 						y = item.y,
 						width = item.width;
 
-					var speed = item.speed = item.speed*(friction+0.003);
+					var speed = item.speed = item.speed*(friction+0.002);
 					if (speed < 0.1) {
 						stopAnimation = true;
 					}
@@ -250,10 +252,10 @@
 						x += sin*speed;
 					}
 
-					if (y > wHeight + width * cos){
+					if (y > height + width * cos){
 						y = -width * cos;
 					} else if (y < -width * cos){
-						y = wHeight + width * cos;
+						y = height + width * cos;
 					} else {
 						y -= cos*speed;
 					}
@@ -283,7 +285,7 @@
 						polygons.push({
 							sides: config.polygon.sides,
 							x: M.random() * wWidth,
-							y: M.random() * wHeight,
+							y: M.random() * config.drawAreaHeight,
 							radius: M.random()*(20+j*5)+(20+j*5),
 							color: config.polygon.color,
 							alpha: M.random()*0.2+(config.polygon.alpha-j*0.1),
@@ -299,7 +301,7 @@
 					for (var j=0; j<config.circle.layer; j++){
 						circles.push({
 							x: M.random() * wWidth,
-							y: M.random() * wHeight,
+							y: M.random() * config.drawAreaHeight,
 							radius: M.random()*(20+j*5)+(20+j*5),
 							color: config.circle.color,
 							alpha: M.random()*0.2+(config.circle.alpha-j*0.1),
@@ -314,7 +316,7 @@
 					for (var n=0; n<config.line.layer; n++){
 						lines.push({
 							x: M.random() * wWidth,
-							y: M.random() * wHeight,
+							y: M.random() * config.drawAreaHeight,
 							width: M.random()*(20+n*5)+(20+n*5),
 							color: config.line.color,
 							alpha: M.random()*0.2+(config.line.alpha-n*0.1),
