@@ -14,7 +14,7 @@
   // });
 
   // Gallery
-  var play = function(parent, item, callback){
+  var play = function(parent, item, animate, callback){
     var width = parent.width();
 
     item.imagesLoaded(function(){
@@ -23,8 +23,13 @@
         nHeight = _this.naturalHeight;
 
       callback();
-      this.animate({opacity: 1}, 500);
-      parent.animate({height: width * nHeight / nWidth}, 500);
+      if (animate) {
+        this.animate({opacity: 1}, 500);
+        parent.animate({height: width * nHeight / nWidth}, 500);
+      } else {
+        this.css({opacity: 1});
+        parent.css({height: width * nHeight / nWidth});
+      }
     });
   };
 
@@ -35,7 +40,7 @@
       all = photoset.length,
       loading = true;
 
-    play($this, photoset.eq(0), function(){
+    play($this, photoset.eq(0), false, function(){
       loading = false;
     });
 
@@ -49,7 +54,7 @@
         var next = (current - 1) % all;
         loading = true;
 
-        play($this, photoset.eq(next), function(){
+        play($this, photoset.eq(next), true, function(){
           photoset.eq(current).animate({opacity: 0}, 500);
           loading = false;
           current = next;
@@ -60,7 +65,7 @@
         var next = (current + 1) % all;
         loading = true;
 
-        play($this, photoset.eq(next), function(){
+        play($this, photoset.eq(next), true, function(){
           photoset.eq(current).animate({opacity: 0}, 500);
           loading = false;
           current = next;
