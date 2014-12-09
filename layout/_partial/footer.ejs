@@ -1,15 +1,16 @@
 <div class="social alignright">
-  <% if (theme.facebook){ %>
-    <a class="facebook" href="http://www.facebook.com/<%= theme.facebook %>" title="Facebook">Facebook</a>
+  <% if (theme.facebook_page){ %>
+  <div class="fb-like" data-href="http://www.facebook.com/<%= theme.facebook_page %>" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+    <a class="facebook" href="http://www.facebook.com/<%= theme.facebook_page %>" target="_blank" title="Facebook">Facebook</a>
   <% } %>
   <% if (theme.google_plus){ %>
-    <a class="google" href="https://plus.google.com/<%= theme.google_plus %>" title="Google+">Google+</a>
+    <a class="google" href="https://plus.google.com/<%= theme.google_plus %>" target="_blank" title="Google+">Google+</a>
   <% } %>
   <% if (theme.twitter){ %>
-    <a class="twitter" href="http://twitter.com/<%= theme.twitter %>" title="Twitter">Twitter</a>
+    <a class="twitter" href="http://twitter.com/<%= theme.twitter %>" target="_blank" title="Twitter">Twitter</a>
   <% } %>
   <% if (theme.github){ %>
-    <a class="github" href="https://github.com/<%= theme.github %>" title="GitHub">GitHub</a>
+    <a class="github" href="https://github.com/<%= theme.github %>" target="_blank" title="GitHub">GitHub</a>
   <% } %>
   <a class="rss" href="<% if (theme.rss){ %><%- theme.rss %><% } else { %><%- config.root %>atom.xml<% } %>" title="RSS">RSS</a>
 </div>
