@@ -1,7 +1,9 @@
 <%- partial('phasebeam') %>
 
 <script src="<%- config.root %>js/jquery.imagesloaded.min.js"></script>
+<% if (theme.gallery){ %>
 <script src="<%- config.root %>js/gallery.js"></script>
+<% } %>
 
 <% if (config.disqus_shortname){ %>
 <script type="text/javascript">

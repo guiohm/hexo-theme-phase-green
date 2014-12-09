@@ -22,6 +22,7 @@ twitter:
 github:
 
 fancybox: true
+gallery: true
 excerpt_link: true
 google_analytics:
 rss:
