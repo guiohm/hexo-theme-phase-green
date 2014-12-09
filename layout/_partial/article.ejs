@@ -16,6 +16,9 @@
       <% } %>
     <% } else { %>
       <%- item.content %>
+      <% if (item.credits) {%>
+        <%- partial('post/credits') %>
+      <% } %>
     <% } %>
     <% if (item.layout != 'page'){ %>
     <footer class="meta">
