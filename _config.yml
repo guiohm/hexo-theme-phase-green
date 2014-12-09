@@ -2,6 +2,7 @@ menu:
   Home: /
   Archives: /archives
 
+# Used for image og tag on index page
 site_image: /images/Flower.jpg
 
 addthis:
