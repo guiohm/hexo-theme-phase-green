@@ -6,7 +6,7 @@
 		config = {
 			polygon: {
 				sides: 5,
-				amount: 23,
+				amount: 7, // see in createItem() for other amount
 				layer: 3,
 				color: [97, 207, 157],
 				alpha: 0.3
@@ -23,12 +23,18 @@
 				color: [255, 255, 255],
 				alpha: 0.3
 			},
+			interaction: {
+				boxSize: 300, // a square side
+				force: 144,
+			},
 			speed: 0.6,
 			angle: 36,
 			drawAreaHeight: 233,
-			shutdowntimer: 8000, // milliseconds
-			friction: 0.995
-		};
+			shutdowntimer: 16000, // milliseconds
+			friction: 0.995,
+			version: 1 // randomly changed in createItem()
+		},
+		mouse = {x: 0, y: 0};
 
 	if (background.getContext){
 		var bctx = background.getContext('2d'),
@@ -74,10 +80,10 @@
 			});
 		};
 
-		var drawPolygon = function(x, y, radius, sides, color, alpha, startAngle, anticlockwise) {
+		var drawPolygon = function(x, y, radius, sides, color, alpha, startAngle, convex) {
 			if (sides < 3) return;
 			var a = (M.PI * 2)/sides;
-			a = anticlockwise?-a:a;
+			a = convex ? 2*a : a;
 			var gradient = fctx1.createRadialGradient(x, y, radius, x, y, 0);
 			gradient.addColorStop(0, 'rgba('+color[0]+','+color[1]+','+color[2]+','+alpha+')');
 			gradient.addColorStop(1, 'rgba('+color[0]+','+color[1]+','+color[2]+','+(alpha-0.1)+')');
@@ -89,7 +95,7 @@
 			}
 			fctx1.moveTo(radius,0);
 			for (var i = 1; i < sides; i++) {
-				fctx1.lineTo(radius*Math.cos(a*i),radius*Math.sin(a*i));
+				fctx1.lineTo(radius*M.cos(a*i),radius*M.sin(a*i));
 			}
 			fctx1.closePath();
 			fctx1.restore();
@@ -156,6 +162,7 @@
 			bctx.beginPath();
 			bctx.fillStyle = gradient[2];
 			bctx.fillRect(0, 0, wWidth, wHeight);
+
 		};
 
 		var animate = function(){
@@ -163,7 +170,8 @@
 				cos = M.cos(degree),
 				friction,
 				stopAnimation = false,
-				height = config.drawAreaHeight;
+				height = config.drawAreaHeight,
+				max = config.interaction.boxSize;
 
 			friction = shutdowntimer > 0 ? 1 : config.friction;
 
@@ -192,10 +200,18 @@
 					} else {
 						y -= cos*speed;
 					}
+					if ((mouse.x - max) < x && x < (mouse.x + max) && (mouse.y - max) < y && y < (mouse.y + max)){
+						d = M.pow(x-mouse.x, 2) + M.pow(y-mouse.y, 2);
+						x += config.interaction.force / d * (x-mouse.x);
+						y += config.interaction.force / d * (y-mouse.y);
+					}
 
 					item.x = x;
 					item.y = y;
 					drawPolygon(x, y, radius, item.sides, item.color, item.alpha, item.angle);
+					if (config.version > 1){
+						drawPolygon(x, y, radius, item.sides, item.color, item.alpha, item.angle, true);
+					}
 				}
 			}
 
@@ -239,7 +255,7 @@
 						y = item.y,
 						width = item.width;
 
-					var speed = item.speed = item.speed*(friction+0.002);
+					var speed = item.speed = item.speed*friction;
 					if (speed < 0.1) {
 						stopAnimation = true;
 					}
@@ -278,12 +294,16 @@
 			polygons = [];
 			circles = [];
 			lines = [];
+			config.version = Math.random()*2;
+			if (config.version < 1) {
+				config.polygon.amount = 23;
+			}
 
 			if (config.polygon.amount > 0 && config.polygon.layer > 0){
 				for (var i=0; i<config.polygon.amount/config.polygon.layer; i++){
 					for (var j=0; j<config.polygon.layer; j++){
 						polygons.push({
-							sides: config.polygon.sides,
+							sides: M.ceil(M.random()*2)+4,//config.polygon.sides,
 							x: M.random() * wWidth,
 							y: M.random() * config.drawAreaHeight,
 							radius: M.random()*(20+j*5)+(20+j*5),
@@ -331,9 +351,28 @@
 			drawBack();
 		};
 
+		var doMouseDown = function(event){
+			console.log(event);
+			if (event.y <= config.drawAreaHeight) {
+				createItem();
+			}
+		}
+
+		var doMouseMove = function(event){
+			if (event.y <= config.drawAreaHeight+400) {
+				mouse.x = event.x;
+				mouse.y = event.y;
+				shutdowntimer = config.shutdowntimer;
+			}
+		}
+
 		$(document).ready(function(){
 			setCanvasHeight();
 			createItem();
+			var b = document.getElementsByTagName('body');
+			console.log(b);
+			b[0].addEventListener("mousedown", doMouseDown);
+			b[0].addEventListener("mousemove", doMouseMove);
 		});
 		$(window).resize(function(){
 			setCanvasHeight();
