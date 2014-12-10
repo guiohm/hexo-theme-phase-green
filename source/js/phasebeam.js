@@ -30,7 +30,7 @@
 			speed: 0.12,
 			init_momentum: 200,
 			angle: 36,
-			drawAreaHeight: 233,
+			drawAreaHeight: 241,
 			shutdowntimer: 4000, // milliseconds
 			friction: 0.992,
 			version: 1 // randomly changed in createItem()
