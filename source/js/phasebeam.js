@@ -386,7 +386,7 @@
 		}
 
 		var doMouseMove = function(event){
-			if (event.y <= config.drawAreaHeight+400) {
+			if (event.y <= config.drawAreaHeight+200) {
 				mouse.x = event.x;
 				mouse.y = event.y;
 				shutdowntimer = config.shutdowntimer;
