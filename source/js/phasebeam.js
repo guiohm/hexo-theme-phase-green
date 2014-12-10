@@ -24,17 +24,19 @@
 				alpha: 0.3
 			},
 			interaction: {
-				boxSize: 300, // a square side
-				force: 144,
+				boxSize: 200, // a square side
+				force: 420,
 			},
-			speed: 0.6,
+			speed: 0.12,
+			init_momentum: 200,
 			angle: 36,
 			drawAreaHeight: 233,
-			shutdowntimer: 16000, // milliseconds
-			friction: 0.995,
+			shutdowntimer: 4000, // milliseconds
+			friction: 0.992,
 			version: 1 // randomly changed in createItem()
 		},
-		mouse = {x: 0, y: 0};
+		mouse = {x: 0, y: 0}
+		stopAnimation = false;
 
 	if (background.getContext){
 		var bctx = background.getContext('2d'),
@@ -169,7 +171,6 @@
 			var sin = M.sin(degree),
 				cos = M.cos(degree),
 				friction,
-				stopAnimation = false,
 				height = config.drawAreaHeight,
 				max = config.interaction.boxSize;
 
@@ -181,36 +182,44 @@
 					var item = polygons[i],
 						x = item.x,
 						y = item.y,
-						radius = item.radius;
+						radius = item.radius
+						mouse_interact = false,
+						interaction_distance= 0;
 
-					var speed = item.speed = item.speed*friction;
+					item.momentum_x = item.momentum_x * item.friction;
+					item.momentum_y = item.momentum_y * item.friction;
+
+					if ((mouse.x - max) < x && x < (mouse.x + max) && (mouse.y - max) < y && y < (mouse.y + max)){
+						mouse_interact = true;
+						interaction_distance = M.pow(x-mouse.x, 2) + M.pow(y-mouse.y, 2);
+					}
 
 					if (x > wWidth + radius){
-						x = -radius;
+						item.x = -radius;
 					} else if (x < -radius){
-						x = wWidth + radius
-					} else {
-						x += sin*speed;
+						item.x = wWidth + radius;
+					} else if (mouse_interact){
+						item.momentum_x += config.interaction.force / M.pow(interaction_distance,1.2) * (x-mouse.x);
 					}
 
 					if (y > height + radius){
-						y = -radius;
+						item.y = -radius;
 					} else if (y < -radius){
-						y = height + radius;
-					} else {
-						y -= cos*speed;
-					}
-					if ((mouse.x - max) < x && x < (mouse.x + max) && (mouse.y - max) < y && y < (mouse.y + max)){
-						d = M.pow(x-mouse.x, 2) + M.pow(y-mouse.y, 2);
-						x += config.interaction.force / d * (x-mouse.x);
-						y += config.interaction.force / d * (y-mouse.y);
+						item.y = height + radius;
+					} else if (mouse_interact){
+						item.momentum_y += config.interaction.force / M.pow(interaction_distance,1.2) * (y-mouse.y);
 					}
 
-					item.x = x;
-					item.y = y;
-					drawPolygon(x, y, radius, item.sides, item.color, item.alpha, item.angle);
+					if (shutdowntimer > 0) {
+						item.momentum_x += item.speed_x;
+						item.momentum_y += item.speed_y;
+					}
+
+					item.x += item.momentum_x;
+					item.y += item.momentum_y;
+					drawPolygon(item.x, item.y, radius, item.sides, item.color, item.alpha, item.angle);
 					if (config.version > 1){
-						drawPolygon(x, y, radius, item.sides, item.color, item.alpha, item.angle, true);
+						drawPolygon(item.x, item.y, radius, item.sides, item.color, item.alpha, item.angle, true);
 					}
 				}
 			}
@@ -241,6 +250,11 @@
 						y -= cos*speed;
 					}
 
+					if (shutdowntimer > 0) {
+						x += sin*speed;
+						y -= cos*speed;
+					}
+
 					item.x = x;
 					item.y = y;
 					drawCircle(x, y, radius, item.color, item.alpha);
@@ -253,9 +267,15 @@
 					var item = lines[j],
 						x = item.x,
 						y = item.y,
-						width = item.width;
+						width = item.width
+						speed;
 
-					var speed = item.speed = item.speed*friction;
+					if (shutdowntimer > 0) {
+						speed = item.speed = item.main_speed;
+					} else {
+						speed = item.speed = item.speed*friction;
+					}
+
 					if (speed < 0.1) {
 						stopAnimation = true;
 					}
@@ -302,15 +322,20 @@
 			if (config.polygon.amount > 0 && config.polygon.layer > 0){
 				for (var i=0; i<config.polygon.amount/config.polygon.layer; i++){
 					for (var j=0; j<config.polygon.layer; j++){
+						var speed = config.speed*(1+j*0.5);
 						polygons.push({
 							sides: M.ceil(M.random()*2)+4,//config.polygon.sides,
 							x: M.random() * wWidth,
 							y: M.random() * config.drawAreaHeight,
+							speed_x: M.sin(degree)*speed,
+							speed_y: M.cos(degree)*speed,
+							momentum_x: M.sin(degree)*speed*config.init_momentum,
+							momentum_y: -M.cos(degree)*speed*config.init_momentum,
+							friction: M.random()*0.1+0.88,
 							radius: M.random()*(20+j*5)+(20+j*5),
 							color: config.polygon.color,
 							alpha: M.random()*0.2+(config.polygon.alpha-j*0.1),
-							angle: M.random()*360/config.polygon.sides,
-							speed: config.speed*(1+j*0.5)
+							angle: M.random()*360/config.polygon.sides
 						});
 					}
 				}
@@ -334,13 +359,15 @@
 			if (config.line.amount > 0 && config.line.layer > 0){
 				for (var m=0; m<config.line.amount/config.line.layer; m++){
 					for (var n=0; n<config.line.layer; n++){
+						var speed = (config.speed+0.5)*(1+n*0.5)
 						lines.push({
 							x: M.random() * wWidth,
 							y: M.random() * config.drawAreaHeight,
 							width: M.random()*(20+n*5)+(20+n*5),
 							color: config.line.color,
 							alpha: M.random()*0.2+(config.line.alpha-n*0.1),
-							speed: config.speed*(1+n*0.5)
+							speed: speed,
+							main_speed: speed
 						});
 					}
 				}
@@ -363,16 +390,19 @@
 				mouse.x = event.x;
 				mouse.y = event.y;
 				shutdowntimer = config.shutdowntimer;
+				if (stopAnimation) {
+					stopAnimation = false;
+					timer = requestAnimationFrame(animate);
+				}
 			}
 		}
 
 		$(document).ready(function(){
 			setCanvasHeight();
-			createItem();
 			var b = document.getElementsByTagName('body');
-			console.log(b);
 			b[0].addEventListener("mousedown", doMouseDown);
 			b[0].addEventListener("mousemove", doMouseMove);
+			createItem();
 		});
 		$(window).resize(function(){
 			setCanvasHeight();
